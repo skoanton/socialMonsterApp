@@ -11,9 +11,12 @@ export default function HomeLayout() {
   console.log("HomeLayout:", monsterContext?.currentMonster?.name);
   return (
     <MonsterProvider>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
+      <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar style="auto" />
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+      </SafeAreaView>
     </MonsterProvider>
   );
 }

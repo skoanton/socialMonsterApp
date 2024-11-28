@@ -2,12 +2,17 @@ import { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { fetchMonsters } from "../api/monsters";
 import { Monster } from "../types/monsters";
-import MonsterListCard from "./MonsterListCard";
+import { useMonster } from "../context/MonsterContext";
+import Button from "./Button";
+import { router } from "expo-router";
+import CreateAccountModal from "./CreateAccountModal";
 
 type MonsterListProps = {};
 
 export default function MonsterList({}: MonsterListProps) {
+  const monsterContext = useMonster();
   const [monsters, setMonsters] = useState<Monster[]>([]);
+  const [showModal, setShowModal] = useState(false);
   useEffect(() => {
     const getMonsters = async () => {
       const response = await fetchMonsters();
@@ -20,15 +25,34 @@ export default function MonsterList({}: MonsterListProps) {
     getMonsters();
   }, []);
 
+  const handleLogin = (monster: Monster) => {
+    if (monster) {
+      monsterContext?.selectMonster(monster);
+    } else {
+      console.error("No monster selected");
+    }
+  };
+  const handleCreateAccount = () => {
+    setShowModal(true);
+  };
+
+  const onModalClose = () => {
+    setShowModal(false);
+  };
+
   return (
     <>
       <View style={styles.container}>
-        <Text style={styles.header}>Välj vem du vill logga in som</Text>
+        <Text style={styles.header}>Välj konto</Text>
+        <Button onPress={() => handleCreateAccount()} title={"Skapa konto"} />
         <FlatList
           style={styles.list}
           data={monsters}
-          renderItem={({ item }) => <MonsterListCard monster={item} />}
+          renderItem={({ item }) => (
+            <Button onPress={() => handleLogin(item)} title={item.name} />
+          )}
         />
+        <CreateAccountModal isVisible={showModal} onClose={onModalClose} />
       </View>
     </>
   );
@@ -41,9 +65,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  list: {
-    width: "100%",
-  },
+  list: {},
   header: {
     fontSize: 24,
     marginBottom: 20,
